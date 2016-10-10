@@ -26,7 +26,7 @@ public class Client {
             }
         });
         try {
-            future.get((long) (duration * OVERHEAD), timeUnit);
+            future.get(duration * OVERHEAD, timeUnit);
             System.out.println(
                 String.format("Successfully executed task for %s %s.", duration, timeUnit));
         } catch (InterruptedException e) {
@@ -44,14 +44,14 @@ public class Client {
         String host = (args.length < 1) ? null : args[0];
 
         try {
-            Registry registry = LocateRegistry.getRegistry(host);
+            Registry registry = LocateRegistry.getRegistry(host, 1099);
 
             DoSomething stub = (DoSomething) registry.lookup(DoSomething.registryID);
 
-            TimeUnit timeUnit = TimeUnit.SECONDS;
-            long start = 1;
-            long interval = 1;
-            long end = 5;
+            TimeUnit timeUnit = TimeUnit.MINUTES;
+            long start = 5;
+            long interval = 5;
+            long end = 60;
 
             while (start <= end) {
                 doSomething(stub, start, timeUnit);
