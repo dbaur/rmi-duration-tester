@@ -16,26 +16,30 @@ public class Client {
 
     }
 
-    public static void doSomething(final DoSomething stub, final long duration,
+    private static void doSomething(final DoSomething stub, final long duration,
         final TimeUnit timeUnit) {
 
-        Future<Void> future = executorService.submit(new Callable<Void>() {
-            public Void call() throws Exception {
-                stub.doSomething(duration, timeUnit);
-                return null;
-            }
-        });
+        Future<DoSomethingResult> future =
+            executorService.submit(new Callable<DoSomethingResult>() {
+                public DoSomethingResult call() throws Exception {
+                    return stub.doSomething(duration, timeUnit);
+                }
+            });
         try {
-            future.get(duration * OVERHEAD, timeUnit);
-            System.out.println(
-                String.format("Successfully executed task for %s %s.", duration, timeUnit));
+            final DoSomethingResult doSomethingResult = future.get(duration * OVERHEAD, timeUnit);
+            System.out.println(String
+                .format("Successfully executed task for %s %s. Got result %s.", duration, timeUnit,
+                    doSomethingResult));
         } catch (InterruptedException e) {
+            System.err.println("Got interrupted.");
             e.printStackTrace();
         } catch (ExecutionException e) {
+            System.err.println("Error during execution of doSomething: " + e.getMessage());
             e.printStackTrace();
         } catch (TimeoutException e) {
             System.err.println(
                 String.format("Task for %s %s failed due to timeout!", duration, timeUnit));
+            e.printStackTrace();
         }
     }
 

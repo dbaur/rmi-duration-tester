@@ -27,11 +27,20 @@ public class Server implements DoSomething {
         }
     }
 
-    public void doSomething(long duration, TimeUnit timeUnit) {
+    public DoSomethingResult doSomething(long duration, TimeUnit timeUnit)
+        throws DoSomethingException {
+        System.out.println(
+            String.format("Starting execution of doSomething for %s %s", duration, timeUnit));
+        long start = System.currentTimeMillis();
         try {
             Thread.sleep(timeUnit.toMillis(duration));
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new DoSomethingException("Could not sleep, got interrupted.", e);
         }
+        long end = System.currentTimeMillis();
+        final DoSomethingResult doSomethingResult = new DoSomethingResult(end - start);
+        System.out.println(
+            String.format("Finished execution of doSomething. Result: %s.", doSomethingResult));
+        return doSomethingResult;
     }
 }

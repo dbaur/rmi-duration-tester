@@ -11,6 +11,7 @@ public interface DoSomething extends Remote {
 
     String registryID = "doSomething";
 
-    void doSomething(long duration, TimeUnit timeUnit) throws RemoteException;
+    DoSomethingResult doSomething(long duration, TimeUnit timeUnit)
+        throws RemoteException, DoSomethingException;
 
 }
