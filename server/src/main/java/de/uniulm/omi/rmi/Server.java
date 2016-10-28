@@ -10,14 +10,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class Server implements DoSomething {
 
+    private static DoSomething stub;
+    private static Registry registry;
+
     public static void main(String args[]) {
 
         try {
             Server obj = new Server();
-            DoSomething stub = (DoSomething) UnicastRemoteObject.exportObject(obj, 33033);
+            stub = (DoSomething) UnicastRemoteObject.exportObject(obj, 33033);
 
             // Bind the remote object's stub in the registry
-            Registry registry = LocateRegistry.createRegistry(1099);
+            registry = LocateRegistry.createRegistry(1099);
             registry.bind(DoSomething.registryID, stub);
 
             System.err.println("Server ready");

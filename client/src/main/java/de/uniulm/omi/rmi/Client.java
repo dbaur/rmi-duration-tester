@@ -11,25 +11,27 @@ public class Client {
 
     private static ExecutorService executorService = Executors.newFixedThreadPool(1);
     private static final long OVERHEAD = 2;
+    private static Registry registry;
+    private static DoSomething stub;
 
     private Client() {
 
     }
 
     private static void doSomething(final DoSomething stub, final long duration,
-        final TimeUnit timeUnit) {
+                                    final TimeUnit timeUnit) {
 
         Future<DoSomethingResult> future =
-            executorService.submit(new Callable<DoSomethingResult>() {
-                public DoSomethingResult call() throws Exception {
-                    return stub.doSomething(duration, timeUnit);
-                }
-            });
+                executorService.submit(new Callable<DoSomethingResult>() {
+                    public DoSomethingResult call() throws Exception {
+                        return stub.doSomething(duration, timeUnit);
+                    }
+                });
         try {
             final DoSomethingResult doSomethingResult = future.get(duration * OVERHEAD, timeUnit);
             System.out.println(String
-                .format("Successfully executed task for %s %s. Got result %s.", duration, timeUnit,
-                    doSomethingResult));
+                    .format("Successfully executed task for %s %s. Got result %s.", duration, timeUnit,
+                            doSomethingResult));
         } catch (InterruptedException e) {
             System.err.println("Got interrupted.");
             e.printStackTrace();
@@ -38,7 +40,7 @@ public class Client {
             e.printStackTrace();
         } catch (TimeoutException e) {
             System.err.println(
-                String.format("Task for %s %s failed due to timeout!", duration, timeUnit));
+                    String.format("Task for %s %s failed due to timeout!", duration, timeUnit));
             e.printStackTrace();
         }
     }
@@ -48,12 +50,12 @@ public class Client {
         String host = (args.length < 1) ? null : args[0];
 
         try {
-            Registry registry = LocateRegistry.getRegistry(host, 1099);
+            registry = LocateRegistry.getRegistry(host, 1099);
 
-            DoSomething stub = (DoSomething) registry.lookup(DoSomething.registryID);
+            stub = (DoSomething) registry.lookup(DoSomething.registryID);
 
             TimeUnit timeUnit = TimeUnit.MINUTES;
-            long start = 5;
+            long start = 1;
             long interval = 5;
             long end = 60;
 
