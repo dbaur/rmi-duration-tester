@@ -2,6 +2,7 @@ package de.uniulm.omi.rmi;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.ExportException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.TimeUnit;
 
@@ -15,12 +16,19 @@ public class Server implements DoSomething {
 
     public static void main(String args[]) {
 
+        int port = Integer.parseInt((args.length < 1) ? null : args[0]);
+
         try {
             Server obj = new Server();
-            stub = (DoSomething) UnicastRemoteObject.exportObject(obj, 33033);
+            stub = (DoSomething) UnicastRemoteObject.exportObject(obj, port);
 
             // Bind the remote object's stub in the registry
-            registry = LocateRegistry.createRegistry(1099);
+            try {
+                registry = LocateRegistry.createRegistry(1099);
+            } catch (ExportException e) {
+                registry = LocateRegistry.getRegistry(1099);
+            }
+
             registry.bind(DoSomething.registryID, stub);
 
             System.err.println("Server ready");
@@ -31,9 +39,9 @@ public class Server implements DoSomething {
     }
 
     public DoSomethingResult doSomething(long duration, TimeUnit timeUnit)
-        throws DoSomethingException {
+            throws DoSomethingException {
         System.out.println(
-            String.format("Starting execution of doSomething for %s %s", duration, timeUnit));
+                String.format("Starting execution of doSomething for %s %s", duration, timeUnit));
         long start = System.currentTimeMillis();
         try {
             Thread.sleep(timeUnit.toMillis(duration));
@@ -43,7 +51,7 @@ public class Server implements DoSomething {
         long end = System.currentTimeMillis();
         final DoSomethingResult doSomethingResult = new DoSomethingResult(end - start);
         System.out.println(
-            String.format("Finished execution of doSomething. Result: %s.", doSomethingResult));
+                String.format("Finished execution of doSomething. Result: %s.", doSomethingResult));
         return doSomethingResult;
     }
 }

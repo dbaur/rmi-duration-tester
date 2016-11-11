@@ -24,6 +24,7 @@ public class Client {
         Future<DoSomethingResult> future =
                 executorService.submit(new Callable<DoSomethingResult>() {
                     public DoSomethingResult call() throws Exception {
+                        System.out.println(String.format("Starting RMI call using stub %s, duration %s and timeUnit %s.", stub, duration, timeUnit));
                         return stub.doSomething(duration, timeUnit);
                     }
                 });
